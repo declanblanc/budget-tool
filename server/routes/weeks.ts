@@ -1,15 +1,9 @@
 import { Router, Request, Response } from "express";
-import { getISOWeek, getISOWeekYear } from "date-fns";
 import { sql } from "../db";
+import getWeekId from "../utils/getWeekId";
 
 const weekly_budget = 333;
 export const weekRoutes = Router();
-function getWeekId() {
-  const today = new Date();
-  return (
-    getISOWeekYear(today) + "-W" + getISOWeek(today).toString().padStart(2, "0")
-  );
-}
 
 weekRoutes.get("/api/weeks/current", async (req: Request, res: Response) => {
   const weekId = getWeekId();
@@ -26,11 +20,6 @@ weekRoutes.get("/api/weeks", async (req: Request, res: Response) => {
   res.json(rows);
 });
 
-// - [ ] POST "/api/weeks"
-//       Read { id, budget } from req.body
-//       Query: INSERT INTO weeks (id, budget) VALUES (${id}, ${budget})
-//              ON CONFLICT (id) DO UPDATE SET budget = ${budget}
-//       Return the upserted week as JSON
 weekRoutes.post("/api/weeks", async (req: Request, res: Response) => {
   console.log(`POST: /api/weeks ${JSON.stringify(req.body)}`);
   const { id, budget } = req.body;
